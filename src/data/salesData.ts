@@ -104,4 +104,161 @@
  export const getSegments = () => [...new Set(salesData.map((d) => d.segment))];
  
  // Get unique countries
- export const getCountries = () => [...new Set(salesData.map((d) => d.country))];
+export const getCountries = () => [...new Set(salesData.map((d) => d.country))];
+
+// Get unique products
+export const getProducts = () => [...new Set(salesData.map((d) => d.product))];
+
+// Filter sales data
+export const filterSalesData = (
+  countries: string[] = [],
+  segments: string[] = []
+): SalesData[] => {
+  return salesData.filter((item) => {
+    const countryMatch = countries.length === 0 || countries.includes(item.country);
+    const segmentMatch = segments.length === 0 || segments.includes(item.segment);
+    return countryMatch && segmentMatch;
+  });
+};
+
+// Get filtered aggregates by country
+export const getFilteredCountryAggregates = (
+  countries: string[] = [],
+  segments: string[] = []
+) => {
+  const filtered = filterSalesData(countries, segments);
+  const aggregates = filtered.reduce((acc, item) => {
+    if (!acc[item.country]) {
+      acc[item.country] = {
+        country: item.country,
+        countryCode: item.countryCode,
+        totalSales: 0,
+        totalProfit: 0,
+        totalUnits: 0,
+      };
+    }
+    acc[item.country].totalSales += item.sales;
+    acc[item.country].totalProfit += item.profit;
+    acc[item.country].totalUnits += item.unitsSold;
+    return acc;
+  }, {} as Record<string, { country: string; countryCode: string; totalSales: number; totalProfit: number; totalUnits: number }>);
+  
+  return Object.values(aggregates);
+};
+
+// Get filtered aggregates by segment
+export const getFilteredSegmentAggregates = (
+  countries: string[] = [],
+  segments: string[] = []
+) => {
+  const filtered = filterSalesData(countries, segments);
+  const aggregates = filtered.reduce((acc, item) => {
+    if (!acc[item.segment]) {
+      acc[item.segment] = {
+        segment: item.segment,
+        totalSales: 0,
+        totalProfit: 0,
+        totalUnits: 0,
+      };
+    }
+    acc[item.segment].totalSales += item.sales;
+    acc[item.segment].totalProfit += item.profit;
+    acc[item.segment].totalUnits += item.unitsSold;
+    return acc;
+  }, {} as Record<string, { segment: string; totalSales: number; totalProfit: number; totalUnits: number }>);
+  
+  return Object.values(aggregates);
+};
+
+// Get filtered totals
+export const getFilteredTotals = (
+  countries: string[] = [],
+  segments: string[] = []
+) => {
+  const filtered = filterSalesData(countries, segments);
+  return filtered.reduce(
+    (acc, item) => ({
+      totalSales: acc.totalSales + item.sales,
+      totalProfit: acc.totalProfit + item.profit,
+      totalUnits: acc.totalUnits + item.unitsSold,
+      totalTransactions: acc.totalTransactions + 1,
+    }),
+    { totalSales: 0, totalProfit: 0, totalUnits: 0, totalTransactions: 0 }
+  );
+};
+
+// Get monthly trend data
+export const getMonthlyTrend = (
+  countries: string[] = [],
+  segments: string[] = []
+) => {
+  const filtered = filterSalesData(countries, segments);
+  const monthlyData = filtered.reduce((acc, item) => {
+    const month = item.date.substring(0, 7); // YYYY-MM
+    if (!acc[month]) {
+      acc[month] = {
+        month,
+        sales: 0,
+        profit: 0,
+        units: 0,
+      };
+    }
+    acc[month].sales += item.sales;
+    acc[month].profit += item.profit;
+    acc[month].units += item.unitsSold;
+    return acc;
+  }, {} as Record<string, { month: string; sales: number; profit: number; units: number }>);
+  
+  return Object.values(monthlyData).sort((a, b) => a.month.localeCompare(b.month));
+};
+
+// Get country details with segments breakdown
+export const getCountryDetails = (country: string) => {
+  const countryData = salesData.filter((item) => item.country === country);
+  
+  const bySegment = countryData.reduce((acc, item) => {
+    if (!acc[item.segment]) {
+      acc[item.segment] = {
+        segment: item.segment,
+        sales: 0,
+        profit: 0,
+        units: 0,
+      };
+    }
+    acc[item.segment].sales += item.sales;
+    acc[item.segment].profit += item.profit;
+    acc[item.segment].units += item.unitsSold;
+    return acc;
+  }, {} as Record<string, { segment: string; sales: number; profit: number; units: number }>);
+  
+  const byProduct = countryData.reduce((acc, item) => {
+    if (!acc[item.product]) {
+      acc[item.product] = {
+        product: item.product,
+        sales: 0,
+        profit: 0,
+        units: 0,
+      };
+    }
+    acc[item.product].sales += item.sales;
+    acc[item.product].profit += item.profit;
+    acc[item.product].units += item.unitsSold;
+    return acc;
+  }, {} as Record<string, { product: string; sales: number; profit: number; units: number }>);
+  
+  const totals = countryData.reduce(
+    (acc, item) => ({
+      sales: acc.sales + item.sales,
+      profit: acc.profit + item.profit,
+      units: acc.units + item.unitsSold,
+    }),
+    { sales: 0, profit: 0, units: 0 }
+  );
+  
+  return {
+    country,
+    totals,
+    bySegment: Object.values(bySegment),
+    byProduct: Object.values(byProduct),
+  };
+};

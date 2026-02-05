@@ -3,11 +3,16 @@ import { KPICard } from "@/components/dashboard/KPICard";
 import { SalesByCountryChart } from "@/components/dashboard/SalesByCountryChart";
 import { ProfitBySegmentChart } from "@/components/dashboard/ProfitBySegmentChart";
 import { WorldMapChart } from "@/components/dashboard/WorldMapChart";
-import { getTotals } from "@/data/salesData";
+import { FilterBar } from "@/components/dashboard/FilterBar";
+import { TrendChart } from "@/components/dashboard/TrendChart";
+import { CountryDetailSheet } from "@/components/dashboard/CountryDetailSheet";
+import { DashboardProvider, useDashboard } from "@/contexts/DashboardContext";
+import { getFilteredTotals } from "@/data/salesData";
 import { DollarSign, TrendingUp, Package, ShoppingCart } from "lucide-react";
 
-const Index = () => {
-  const totals = getTotals();
+const DashboardContent = () => {
+  const { filters } = useDashboard();
+  const totals = getFilteredTotals(filters.countries, filters.segments);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -28,6 +33,9 @@ const Index = () => {
     <div className="min-h-screen bg-background p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
         <DashboardHeader />
+
+        {/* Filters */}
+        <FilterBar />
 
         {/* KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -65,18 +73,33 @@ const Index = () => {
         </div>
 
         {/* Charts Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <SalesByCountryChart type="sales" />
           <SalesByCountryChart type="profit" />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <ProfitBySegmentChart />
+          <TrendChart />
         </div>
 
         {/* World Map */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <WorldMapChart />
         </div>
+
+        {/* Country Detail Sheet */}
+        <CountryDetailSheet />
       </div>
     </div>
+  );
+};
+
+const Index = () => {
+  return (
+    <DashboardProvider>
+      <DashboardContent />
+    </DashboardProvider>
   );
 };
 
