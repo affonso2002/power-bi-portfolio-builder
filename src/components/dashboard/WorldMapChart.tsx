@@ -1,6 +1,7 @@
  import { motion } from "framer-motion";
  import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
- import { getCountryAggregates } from "@/data/salesData";
+import { getFilteredCountryAggregates } from "@/data/salesData";
+import { useDashboard } from "@/contexts/DashboardContext";
  import { useState } from "react";
  
  const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
@@ -18,7 +19,8 @@
  };
  
  export const WorldMapChart = () => {
-   const data = getCountryAggregates();
+  const { filters, setSelectedCountry } = useDashboard();
+  const data = getFilteredCountryAggregates(filters.countries, filters.segments);
    const [hoveredCountry, setHoveredCountry] = useState<string | null>(null);
  
    const maxSales = Math.max(...data.map((d) => d.totalSales));
@@ -98,6 +100,7 @@
                  coordinates={coords}
                  onMouseEnter={() => setHoveredCountry(country.country)}
                  onMouseLeave={() => setHoveredCountry(null)}
+                  onClick={() => setSelectedCountry(country.country)}
                >
                  <circle
                    r={size}

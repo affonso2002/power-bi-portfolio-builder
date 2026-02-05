@@ -1,6 +1,7 @@
  import { motion } from "framer-motion";
  import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
- import { getSegmentAggregates } from "@/data/salesData";
+import { getFilteredSegmentAggregates } from "@/data/salesData";
+import { useDashboard } from "@/contexts/DashboardContext";
  
  const COLORS = [
    "hsl(199 89% 48%)",    // chart-1 (cyan)
@@ -11,7 +12,8 @@
  ];
  
  export const ProfitBySegmentChart = () => {
-   const data = getSegmentAggregates().map((item) => ({
+  const { filters } = useDashboard();
+  const data = getFilteredSegmentAggregates(filters.countries, filters.segments).map((item) => ({
      name: item.segment,
      value: item.totalProfit,
    }));

@@ -1,6 +1,7 @@
  import { motion } from "framer-motion";
  import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from "recharts";
- import { getCountryAggregates } from "@/data/salesData";
+import { getFilteredCountryAggregates } from "@/data/salesData";
+import { useDashboard } from "@/contexts/DashboardContext";
  
  interface SalesByCountryChartProps {
    type: "sales" | "profit";
@@ -15,7 +16,8 @@
  ];
  
  export const SalesByCountryChart = ({ type }: SalesByCountryChartProps) => {
-   const rawData = getCountryAggregates();
+  const { filters } = useDashboard();
+  const rawData = getFilteredCountryAggregates(filters.countries, filters.segments);
    const data = rawData
      .map((item) => ({
        country: item.country,
