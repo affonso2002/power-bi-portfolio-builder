@@ -71,3 +71,16 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+
+## Visuais:
+
+- Mapa interativo com vendas e unidades por país
+- Mapa de lucro por país
+- Gráfico de pizza com lucro por segmento
+- Cards de KPIs e filtros
+- 4 KPIs com totais de vendas, lucro, unidades e margem
+- Gráficos de barras (vendas e lucro por país)
+- Gráfico de pizza com lucro por segmento
+- Mapa mundi interativo com marcadores por país
+
+Design: Estilo analytics moderno com tons de azul escuro, gradientes sutis, cards com glassmorphism e animações suaves. Inspirado em dashboards como Tableau e Power BI, mas com uma estética web moderna.
